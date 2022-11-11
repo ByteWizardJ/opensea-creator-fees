@@ -366,9 +366,9 @@ modifier onlyAllowedOperator(address from) virtual {
 
 这里解释一下为什么要限制 `msg.sender` 和 `from`。
 
-首先看一下 Opensea 要限制的合约中分为两类：
+首先看一下 Opensea 要限制的合约是 Blur.io 的 ExecutionDelegate、LooksRare TransferManagerERC721、LooksRare TransferManagerERC1155、X2Y2 ERC721Delegate、X2Y2 ERC1155Delegate、SudoSwap LSSVMPairRouter。
 
-一类是 Blur.io 的 ExecutionDelegate、LooksRare TransferManagerERC721、LooksRare TransferManagerERC1155、X2Y2 ERC721Delegate、X2Y2 ERC1155Delegate
+这些合约的一个共同的特点就是负责最终的代币转移
 
 
 DefaultOperatorFilterer 合约会自动订阅
