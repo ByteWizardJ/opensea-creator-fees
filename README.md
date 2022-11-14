@@ -403,7 +403,7 @@ DefaultOperatorFilterer 是 OperatorFilterer 的一个子类实现。初始化�
 
 ## 参考
 
-1. https://opensea.io/blog/announcements/on-creator-fees/
-2. https://github.com/ProjectOpenSea/operator-filter-registry
-3. https://twitter.com/jason_chen998/status/1589291754129625089
-4. https://twitter.com/opensea/status/1590466334814785537?s=20&t=03NJGkvgayNDVjWKo53vxA
+1. [opensea blog: On Creator Fees](https://opensea.io/blog/announcements/on-creator-fees/)
+2. [operator-filter-registry](https://github.com/ProjectOpenSea/operator-filter-registry)
+3. [jason chen 的推文](https://twitter.com/jason_chen998/status/1589291754129625089)
+4. [opensea 11 月 9 日 更新的说明](https://twitter.com/opensea/status/1590466334814785537?s=20&t=03NJGkvgayNDVjWKo53vxA)
