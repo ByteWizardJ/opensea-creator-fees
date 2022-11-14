@@ -28,9 +28,11 @@ Opensea 前几天推出了链上版税强制执行工具。引发了很大的关
 
 ## Opensea 准备怎么改
 
-1. 推出链上版税强制执行工具，新发行的 NFT 必须集成这个工具才能在 Opensea 上收取版税。
-2. 集成了工具的 NFT 无法在一些平台进行交易。
-
+1. 推出链上版税强制执行工具，新发行的 NFT 项目必须集成这个工具才能在 Opensea 上收取版税。
+2. 集成了该工具的 NFT 无法在一些被限制的平台进行交易。
+3. 对于新项目和可升级的旧项目，建议集成这个链上版税强制执行工具来收取版税。
+4. 对于无法升级的旧项目和未集成工具的新项目在 12 月 8 日之前不进行任何改变。这个日期之后是否收取暂时还不确定。
+5. 11月9日更新了规则：OpenSea 将继续对所有现有收藏收取创作者费用。
 
 ## 如何实现
 
@@ -334,7 +336,7 @@ IOperatorFilterRegistry constant operatorFilterRegistry =
 
 ##### 2. `onlyAllowedOperator` 修饰器
 
-所有需要进行限制的方法都需要加上该修饰器。
+所有需要进行限制的方法都需要加上该修饰器。对应 NFT 合约来说所有的 transfer 方法都要加上这个修饰器。
 
 ```solidity
 modifier onlyAllowedOperator(address from) virtual {
@@ -364,17 +366,44 @@ modifier onlyAllowedOperator(address from) virtual {
     }
 ```
 
-这里解释一下为什么要限制 `msg.sender` 和 `from`。
 
-首先看一下 Opensea 要限制的合约是 Blur.io 的 ExecutionDelegate、LooksRare TransferManagerERC721、LooksRare TransferManagerERC1155、X2Y2 ERC721Delegate、X2Y2 ERC1155Delegate、SudoSwap LSSVMPairRouter。
+###### 为什么要限制 `msg.sender`
 
-这些合约的一个共同的特点就是成交之后负责最终的代币转移。
+> If the application most commonly used to interface with the contract gives buyers and sellers the ability to bypass creator fees when a similar transaction for the same item would require creator fee payment on OpenSea.io
 
+就是说有些应用给予了买卖双方绕过版税的能力。这个说的应该就是一些低版税的交易市场了。
 
-DefaultOperatorFilterer 合约会自动订阅
+先看一下 Opensea 要限制的合约是 Blur.io `ExecutionDelegate`、LooksRare `TransferManagerERC721`、LooksRare `TransferManagerERC1155`、X2Y2 `ERC721Delegate`、X2Y2 `ERC1155Delegate`、SudoSwap `LSSVMPairRouter`。
+
+这些合约的一个共同的特点就是负责成交之后的代币转移。
+
+以 Blur 为例。用户交互的主合约是 `BlurExchange`。成单方法是 `execute()`。这个方法最终会调用 `ExecutionDelegate` 的 `transferERC20()` 、`transferERC721()` 、`transferERC1155` 方法。这些方法再去调用具体的合约的 transfer 方法来进行转移代币。具体实现可以参考我之前写的文章：https://github.com/cryptochou/blur-analysis
+
+因此在这个时候 transfer 方法的 `msg.sender` 就是 `BlurExchange`。
+
+###### 为什么要限制 `from`
+
+> If the contract is facilitating the evasion of on-chain creator fee enforcement measures. For example, the contract uses a wrapper contact to bypass fee enforcement.
+
+这个暂时不是很理解出现的场景。
+
+#### DefaultOperatorFilterer
+
+DefaultOperatorFilterer 是 OperatorFilterer 的一个子类实现。初始化的时候会自动订阅 `0x3cc6CddA760b79bAfa08dF41ECFA224f810dCeB6` 这一地址对应的过滤规则。
+
+简单来说项目方直接使用这个继承这个合约来开发 NFT 就接入并订阅了 Opensea 官方的过滤规则。后续官方规则改变的话也会跟着变换。
+
+## 总结
+
+从上面的代码分析可以看出来，虽然 Opensea 将其包装的很好，但是这个所谓的强制版税工具实际上是个交易黑名单工具。集成了该工具的 NFT 项目就无法在一些平台交易。
+
+满篇的解释文字中也处处透漏着“我们做出了一个艰难的决定”的意味。看来 Blur 等平台的确实对 Opensea 造成了很大的威胁。
+
+至于这个能不能执行下去就看用户和项目方用脚来进行投票了。
 
 ## 参考
 
 1. https://opensea.io/blog/announcements/on-creator-fees/
 2. https://github.com/ProjectOpenSea/operator-filter-registry
-3. 
+3. https://twitter.com/jason_chen998/status/1589291754129625089
+4. https://twitter.com/opensea/status/1590466334814785537?s=20&t=03NJGkvgayNDVjWKo53vxA
