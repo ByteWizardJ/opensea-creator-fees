@@ -272,15 +272,15 @@ Ethereum Mainnet
 </tr>
 
 <tr>
-<td>~~X2Y2 ERC721Delegate~~</td>
-<td>~~0xf849de01b080adc3a814fabe1e2087475cf2e354~~</td>
-<td>~~Ethereum Mainnet~~</td>
+<td><strike> X2Y2 ERC721Delegate<strike></td>
+<td><strike>0xf849de01b080adc3a814fabe1e2087475cf2e354<strike></td>
+<td><strike>Ethereum Mainnet<strike></td>
 </tr>
 
 <tr>
-<td>~~X2Y2 ERC1155Delegate~~</td>
-<td>~~0x024ac22acdb367a3ae52a3d94ac6649fdc1f0779~~</td>
-<td>~~Ethereum Mainnet~~</td>
+<td><strike>X2Y2 ERC1155Delegate<strike></td>
+<td><strike>0x024ac22acdb367a3ae52a3d94ac6649fdc1f0779<strike></td>
+<td><strike>Ethereum Mainnet<strike></td>
 </tr>
 
 <tr>
