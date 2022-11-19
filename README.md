@@ -240,7 +240,8 @@ function registerAndCopyEntries(address registrant, address registrantToCopy)
 该合约充当注册者的角色。要想符合 Opensea 规则继续收版税，项目方的 NFT 合约就必须继承自该合约。并且要过滤一些指定的 operator。
 
 > Contract owners may implement their own filtering outside of this registry, or they may use this registry to curate their own lists of filtered operators. However, there are certain contracts that are filtered by the default subscription, and must be filtered in order to be eligible for creator fee enforcement on OpenSea.
-> 合同所有者可以在此注册表之外实施他们自己的过滤，或者他们可以使用此注册表来管理他们自己的过滤操作员列表。但是，某些合同会被默认订阅过滤，并且必须过滤才能有资格在 OpenSea 上执行创作者费用。
+> 
+> 合约所有者可以在此注册表之外实施他们自己的过滤，或者他们可以使用此注册表来管理他们自己的过滤操作员列表。但是，某些合约会被默认订阅过滤，并且必须过滤才能有资格在 OpenSea 上执行创作者费用。
 
 <table>
 <tr>
@@ -291,7 +292,7 @@ Ethereum Mainnet
 
 </table>
 
-更新：X2Y2 宣布支持版税。OperatorFilterRegistry 中的 X2Y2 相关的地址已被删除。
+更新：X2Y2 宣布支持版税。OperatorFilterRegistry 中的 X2Y2 相关的地址已被删除。https://twitter.com/the_x2y2/status/1593631419561304067
 
 #### 属性
 
@@ -375,19 +376,21 @@ modifier onlyAllowedOperator(address from) virtual {
 
 就是说有些应用给予了买卖双方绕过版税的能力。这个说的应该就是一些低版税的交易市场了。
 
-先看一下 Opensea 要限制的合约是 Blur.io `ExecutionDelegate`、LooksRare `TransferManagerERC721`、LooksRare `TransferManagerERC1155`、X2Y2 `ERC721Delegate`、X2Y2 `ERC1155Delegate`、SudoSwap `LSSVMPairRouter`。
+先看一下 Opensea 要限制的合约是 Blur.io `ExecutionDelegate`、LooksRare `TransferManagerERC721`、LooksRare `TransferManagerERC1155`、X2Y2 `ERC721Delegate`、X2Y2 `ERC1155Delegate`。
 
 这些合约的一个共同的特点就是负责成交之后的代币转移。
 
-以 Blur 为例。用户交互的主合约是 `BlurExchange`。成单方法是 `execute()`。这个方法最终会调用 `ExecutionDelegate` 的 `transferERC20()` 、`transferERC721()` 、`transferERC1155` 方法。这些方法再去调用具体的合约的 transfer 方法来进行转移代币。具体实现可以参考我之前写的文章：https://github.com/cryptochou/blur-analysis
+以 Blur 为例。用户交互的主合约是 `BlurExchange`。成单方法是 `execute()`。这个方法最终会调用 `ExecutionDelegate` 的 `transferERC20()` 、`transferERC721()` 、`transferERC1155` 方法。这些方法再去调用具体的合约的 transfer 方法来进行转移代币。（具体实现可以参考我之前写的文章：https://github.com/cryptochou/blur-analysis）
 
 因此在这个时候 transfer 方法的 `msg.sender` 就是 `BlurExchange`。
 
 ###### 为什么要限制 `from`
 
-> If the contract is facilitating the evasion of on-chain creator fee enforcement measures. For example, the contract uses a wrapper contact to bypass fee enforcement.
+这是因为 SudoSwap 的特殊性。 SudoSwap 有流动池的概念。用户可以将 NFT 放到流动池中，获取 ETH 或 ERC20 代币，表示用户将 NFT 卖给了流动池。也可以将 ETH 或 ERC20 代币放到流动池中，拿出 NFT，表示用户买入了 NFT。（更具体的实现可以参考我的另一篇文章：https://github.com/cryptochou/sudoswap-analysis）
 
-这个暂时不是很理解出现的场景。
+在用户将 NFT 卖给流动池中的时候，最终会由 `LSSVMPairRouter` 的 `pairTransferNFTFrom()` 方法来调用 NFT 的 `safeTransferFrom()` 方法来进行 transfer。这个时候的 `safeTransferFrom()` 的 `msg.sender` 就是 `LSSVMPairRouter`。
+
+在用户用 ETH 或者 ERC20 代币买流动池的 NFT 的时候，最终会由流动池（`LSSVMPair`）的 `_sendAnyNFTsToRecipient()` 或者 `_sendSpecificNFTsToRecipient()` 方法调用 NFT 的 `safeTransferFrom()` 方法来进行 transfer。`from` 参数就是流动池本身。因此限制需要限制 transfer方法的 `from` 参数。不过对于不同的 NFT 来说有不同的流动池，而且 SudoSwap 不同于 Uniswap，同一个交易对可以有多个流动池。因此 Opensea 无法提供一个公共的地址来设置黑名单，需要项目方自己进行设置。
 
 #### DefaultOperatorFilterer
 
