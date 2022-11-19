@@ -65,7 +65,7 @@ Opensea 前几天推出了链上版税强制执行工具。引发了很大的关
 
 ### OperatorFilterRegistry
 
-这个合约用于管理登记者（registrant）。保存了 登记者（registrant）的具体过滤信息。项目管理者可以通过它来更新或删除需要过滤的操作者（operator）。
+这个合约用于管理注册者（registrant）。保存了注册者（registrant）的具体过滤信息。项目管理者可以通过它来更新或删除需要过滤的操作者（operator）。
 
 #### 属性
 
@@ -83,9 +83,9 @@ Opensea 前几天推出了链上版税强制执行工具。引发了很大的关
     mapping(address => EnumerableSet.AddressSet) private _filteredOperators;
 ```
 
-以登记者（registrant）也就是 NFT 合约地址为 key 存储该 NFT 所有需要过滤的操作者（operator）的地址信息。
+以注册者（registrant）也就是 NFT 合约地址为 key 存储该 NFT 所有需要过滤的操作者（operator）的地址信息。
 
-这里有个数据结构 `EnumerableSet.AddressSet`。可以把它等价于一个存放 address 的数组。
+这里有个数据结构 `EnumerableSet.AddressSet`。可以把它等价于一个存放 address 类型数据的数组。
 
 ##### 3. _filteredCodeHashes
 
@@ -93,9 +93,9 @@ Opensea 前几天推出了链上版税强制执行工具。引发了很大的关
     mapping(address => EnumerableSet.Bytes32Set) private _filteredCodeHashes;
 ```
 
-以登记者（registrant）也就是 NFT 合约地址为 key 存储该 NFT 所有需要过滤的操作者（operator）的代码 hash 信息。
+以注册者（registrant）也就是 NFT 合约地址为 key 存储该 NFT 所有需要过滤的操作者（operator）的代码 hash 信息。
 
- `EnumerableSet.Bytes32Set` 跟上面的地址数组类似，可以把它等价于一个存放 bytes32 的数组。
+ `EnumerableSet.Bytes32Set` 跟上面的地址数组类似，可以把它等价于一个存放 bytes32 类型数据的数组。
 
 ##### 4. _registrations
 
@@ -119,7 +119,7 @@ key 是 某个 NFT 的地址。value 是一个地址集合，集合里面是所�
 
 ##### 1. isOperatorAllowed
 
-该方法通过校验某个 operator 是否在登记者（registrant）对应的黑名单中来判断操作是否能通过。
+该方法通过校验某个 operator 是否在注册者（registrant）对应的黑名单中来判断操作是否能通过。
 
 ```solidity
     function isOperatorAllowed(address registrant, address operator) external view returns (bool) {
@@ -129,9 +129,9 @@ key 是 某个 NFT 的地址。value 是一个地址集合，集合里面是所�
             EnumerableSet.AddressSet storage filteredOperatorsRef;
             EnumerableSet.Bytes32Set storage filteredCodeHashesRef;
             
-            // 根据登记者的地址，查出来所需要过滤的 operator 地址
+            // 根据注册者的地址，查出来所需要过滤的 operator 地址
             filteredOperatorsRef = _filteredOperators[registration];
-            // 根据登记者的地址，查出来所需要过滤的 operator 代码 hash
+            // 根据注册者的地址，查出来所需要过滤的 operator 代码 hash
             filteredCodeHashesRef = _filteredCodeHashes[registration];
 
             if (filteredOperatorsRef.contains(operator)) {
@@ -150,7 +150,7 @@ key 是 某个 NFT 的地址。value 是一个地址集合，集合里面是所�
 
 ##### 2. register
 
-在注册处注册一个地址。
+在注册表注册一个地址。
 
 一般在初始化的时候调用，NFT 作为注册者，将其的地址放到 `_registrations` 中。value 和 key 都是这个地址。表明过滤规则在当前地址对应的规则中。
 
@@ -272,24 +272,26 @@ Ethereum Mainnet
 </tr>
 
 <tr>
-<td>X2Y2 ERC721Delegate</td>
-<td>0xf849de01b080adc3a814fabe1e2087475cf2e354</td>
-<td>Ethereum Mainnet</td>
+<td>~~X2Y2 ERC721Delegate~~</td>
+<td>~~0xf849de01b080adc3a814fabe1e2087475cf2e354~~</td>
+<td>~~Ethereum Mainnet~~</td>
 </tr>
 
 <tr>
-<td>X2Y2 ERC1155Delegate</td>
-<td>0x024ac22acdb367a3ae52a3d94ac6649fdc1f0779</td>
-<td>Ethereum Mainnet</td>
+<td>~~X2Y2 ERC1155Delegate~~</td>
+<td>~~0x024ac22acdb367a3ae52a3d94ac6649fdc1f0779~~</td>
+<td>~~Ethereum Mainnet~~</td>
 </tr>
 
 <tr>
 <td>SudoSwap LSSVMPairRouter</td>
-<td>0x2b2e8cda09bba9660dca5cb6233787738ad68329</td>
+<td>0x2B2e8cDA09bBA9660dCA5cB6233787738Ad68329</td>
 <td>Ethereum Mainnet</td>
 </tr>
 
 </table>
+
+更新：X2Y2 宣布支持版税。OperatorFilterRegistry 中的 X2Y2 相关的地址已被删除。
 
 #### 属性
 
