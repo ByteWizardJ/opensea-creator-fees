@@ -386,7 +386,7 @@ modifier onlyAllowedOperator(address from) virtual {
 
 ###### 为什么要限制 `from`
 
-这是因为 SudoSwap 的特殊性。 SudoSwap 有流动池的概念。用户可以将 NFT 放到流动池中，获取 ETH 或 ERC20 代币，表示用户将 NFT 卖给了流动池。也可以将 ETH 或 ERC20 代币放到流动池中，拿出 NFT，表示用户买入了 NFT。（更具体的实现可以参考我的另一篇文章：https://github.com/cryptochou/sudoswap-analysis）
+我猜测是因为 SudoSwap 的特殊性。 SudoSwap 作为去中心化交易所，使用了 AMM 机制，因此它有流动池的概念。用户可以将 NFT 放到流动池中，获取 ETH 或 ERC20 代币，表示用户将 NFT 卖给了流动池。也可以将 ETH 或 ERC20 代币放到流动池中，拿出 NFT，表示用户买入了 NFT。（更具体的实现可以参考我的另一篇文章：https://github.com/cryptochou/sudoswap-analysis）
 
 在用户将 NFT 卖给流动池中的时候，最终会由 `LSSVMPairRouter` 的 `pairTransferNFTFrom()` 方法来调用 NFT 的 `safeTransferFrom()` 方法来进行 transfer。这个时候的 `safeTransferFrom()` 的 `msg.sender` 就是 `LSSVMPairRouter`。
 
