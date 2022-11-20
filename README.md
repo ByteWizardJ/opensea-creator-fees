@@ -386,11 +386,11 @@ modifier onlyAllowedOperator(address from) virtual {
 
 ###### 为什么要限制 `from`
 
-我猜测是因为 SudoSwap 的特殊性。 SudoSwap 作为去中心化交易所，使用了 AMM 机制，因此它有流动池的概念。用户可以将 NFT 放到流动池中，获取 ETH 或 ERC20 代币，表示用户将 NFT 卖给了流动池。也可以将 ETH 或 ERC20 代币放到流动池中，拿出 NFT，表示用户买入了 NFT。（更具体的实现可以参考我的另一篇文章：https://github.com/cryptochou/sudoswap-analysis）
+我猜测是因为 SudoSwap 的特殊性。 SudoSwap 作为去中心化交易所，使用了 AMM 机制，它有流动池的概念。用户可以将 NFT 放到流动池中，获取 ETH 或 ERC20 代币，表示用户将 NFT 卖给了流动池。也可以将 ETH 或 ERC20 代币放到流动池中，拿出 NFT，表示用户买入了 NFT。（更具体的实现可以参考我的另一篇文章：https://github.com/cryptochou/sudoswap-analysis）
 
-在用户将 NFT 卖给流动池中的时候，最终会由 `LSSVMPairRouter` 的 `pairTransferNFTFrom()` 方法来调用 NFT 的 `safeTransferFrom()` 方法来进行 transfer。这个时候的 `safeTransferFrom()` 的 `msg.sender` 就是 `LSSVMPairRouter`。
+在用户将 NFT 卖给流动池中的时候，最终会由 `LSSVMPairRouter` 的 `pairTransferNFTFrom()` 方法来调用 NFT 的 `safeTransferFrom()` 方法来进行 transfer。这个时候的 `safeTransferFrom()` 的 `msg.sender` 就是 `LSSVMPairRouter`。因此这个时候限制 transfer 方法的 `msg.sender` 就可以限制 Sudoswap 上存入流动池的操作。
 
-在用户用 ETH 或者 ERC20 代币买流动池的 NFT 的时候，最终会由流动池（`LSSVMPair`）的 `_sendAnyNFTsToRecipient()` 或者 `_sendSpecificNFTsToRecipient()` 方法调用 NFT 的 `safeTransferFrom()` 方法来进行 transfer。`from` 参数就是流动池本身。因此限制需要限制 transfer方法的 `from` 参数。不过对于不同的 NFT 来说有不同的流动池，而且 SudoSwap 不同于 Uniswap，同一个交易对可以有多个流动池。因此 Opensea 无法提供一个公共的地址来设置黑名单，需要项目方自己进行设置。
+在用户用 ETH 或者 ERC20 代币买流动池的 NFT 的时候，最终会由流动池（`LSSVMPair`）的 `_sendAnyNFTsToRecipient()` 或者 `_sendSpecificNFTsToRecipient()` 方法调用 NFT 的 `safeTransferFrom()` 方法来进行 transfer。`from` 参数就是流动池本身。因此通过限制 transfer 方法的 `from` 参数就可以限制 Sudoswap 上从流动池中取出 NFT 的操作。不过对于不同的 NFT 来说有不同的流动池，而且 SudoSwap 不同于 Uniswap，同一个交易对可以有多个流动池。因此 Opensea 无法提供一个公共的地址来设置黑名单，需要项目方自己进行设置。
 
 #### DefaultOperatorFilterer
 
@@ -402,7 +402,7 @@ DefaultOperatorFilterer 是 OperatorFilterer 的一个子类实现。初始化�
 
 从上面的代码分析可以看出来，虽然 Opensea 将其包装的很好，但是这个所谓的强制版税工具实际上是个交易黑名单工具。集成了该工具的 NFT 项目就无法在一些平台交易。
 
-满篇的解释文字中也处处透漏着“我们做出了一个艰难的决定”的意味。看来 Blur 等平台的确实对 Opensea 造成了很大的威胁。
+满篇的解释文字中也处处透漏着腾讯的那种“我们做出了一个艰难的决定”的意味。看来 Blur 等平台的确实对 Opensea 造成了很大的威胁。
 
 至于这个能不能执行下去就看用户和项目方用脚来进行投票了。
 
